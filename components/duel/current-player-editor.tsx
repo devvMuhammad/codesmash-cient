@@ -20,18 +20,14 @@ export function CurrentPlayerEditor({ playerName }: CurrentPlayerEditorProps) {
   }, [])
 
   return (
-    <Card className="h-full rounded-none border-0 flex flex-col">
-      
-
-      <div className="flex-1 relative">
-        <MonacoEditor
-          value={code}
-          onChange={handleCodeChange}
-          language="javascript"
-          readOnly={false}
-          playerId="current"
-        />
-      </div>
-    </Card>
+    <div className="flex-1 relative h-full">
+      <MonacoEditor
+        value={code}
+        onChange={handleCodeChange}
+        language="javascript"
+        readOnly={false}
+        playerId="current"
+      />
+    </div>
   )
 }

@@ -6,14 +6,13 @@ import { CurrentPlayerEditor } from "@/components/duel/current-player-editor"
 import { OpponentEditor } from "@/components/duel/opponent-editor"
 import { OutputTerminal } from "@/components/duel/output-terminal"
 import { BattleNavbar } from "@/components/duel/battle-navbar"
-import { useMonacoTheme } from "@/hooks/use-monaco-theme"
 import { DuelProvider } from "@/context/duel-context"
 import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 
 export default function DuelPage() {
-  useMonacoTheme()
 
   const [problemSidebarCollapsed, setProblemSidebarCollapsed] = useState(false)
   const [consoleCollapsed, setConsoleCollapsed] = useState(false)
@@ -88,14 +87,18 @@ export default function DuelPage() {
                               <span className="text-xs text-green-400">Connected</span>
                             </div>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setOpponentEditorCollapsed(true)}
-                            className="h-6 w-6 p-0 hover:bg-muted"
-                          >
-                            <ChevronRight className="h-4 w-4" />
-                          </Button>
+                          <Select defaultValue="javascript">
+                            <SelectTrigger size="sm" className="w-32 data-[size=sm]:h-7  text-xs">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="javascript">JavaScript</SelectItem>
+                              <SelectItem value="python">Python</SelectItem>
+                              <SelectItem value="java">Java</SelectItem>
+                              <SelectItem value="cpp">C++</SelectItem>
+                              <SelectItem value="typescript">TypeScript</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div className="flex-1 min-h-0">
                           <CurrentPlayerEditor playerName="You" />

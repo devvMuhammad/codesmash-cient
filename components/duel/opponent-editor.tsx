@@ -26,17 +26,15 @@ export function OpponentEditor({ playerName, status }: OpponentEditorProps) {
 
 
   return (
-    <Card className="h-full rounded-none border-0 flex flex-col">
-      <div className="flex-1 relative min-h-0">
-        <div className="absolute inset-0 backdrop-blur-[1px] bg-black/10 z-10 pointer-events-none" />
-        <MonacoEditor
-          value={code}
-          onChange={() => { }} // No-op for opponent editor
-          language="javascript"
-          readOnly={true}
-          playerId="opponent"
-        />
-      </div>
-    </Card>
+    <div className="flex-1 relative h-full">
+      <div className="absolute inset-0 backdrop-blur-[1px] bg-black/10 z-10 pointer-events-none" />
+      <MonacoEditor
+        value={code}
+        onChange={() => { }} // No-op for opponent editor
+        language="javascript"
+        readOnly={true}
+        playerId="opponent"
+      />
+    </div>
   )
 }

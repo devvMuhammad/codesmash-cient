@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useRef } from "react"
-import * as monaco from "monaco-editor"
+import Editor, { OnMount } from "@monaco-editor/react"
+import type * as monaco from "monaco-editor"
 
 interface MonacoEditorProps {
   value: string
@@ -12,12 +12,7 @@ interface MonacoEditorProps {
 }
 
 export function MonacoEditor({ value, onChange, language, readOnly = false, playerId }: MonacoEditorProps) {
-  const editorRef = useRef<HTMLDivElement>(null)
-  const monacoRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
-
-  useEffect(() => {
-    if (!editorRef.current) return
-
+  const handleEditorDidMount: OnMount = (_, monaco) => {
     // Configure Monaco Editor theme
     monaco.editor.defineTheme("codeDuelDark", {
       base: "vs-dark",
@@ -46,75 +41,82 @@ export function MonacoEditor({ value, onChange, language, readOnly = false, play
       },
     })
 
-    // Create the editor
-    const editor = monaco.editor.create(editorRef.current, {
-      value,
-      language,
-      theme: "codeDuelDark",
-      readOnly,
-      minimap: { enabled: false },
-      scrollBeyondLastLine: false,
-      fontSize: 14,
-      fontFamily: "var(--font-geist-mono), 'Fira Code', 'JetBrains Mono', monospace",
-      lineNumbers: "on",
-      glyphMargin: false,
-      folding: false,
-      lineDecorationsWidth: 0,
-      lineNumbersMinChars: 3,
-      renderLineHighlight: "line",
-      automaticLayout: true,
-      tabSize: 2,
-      insertSpaces: true,
-      wordWrap: "on",
-      contextmenu: false,
-      selectOnLineNumbers: true,
-      roundedSelection: false,
-      cursorStyle: "line",
-      cursorBlinking: "blink",
-      smoothScrolling: true,
-      scrollbar: {
-        vertical: "visible",
-        horizontal: "visible",
-        verticalScrollbarSize: 10,
-        horizontalScrollbarSize: 10,
+    // Apply the theme
+    monaco.editor.setTheme("codeDuelDark")
+
+    // Configure Monaco Editor for better integration
+    monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+      noSemanticValidation: true,
+      noSyntaxValidation: false,
+    })
+
+    monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+      target: monaco.languages.typescript.ScriptTarget.ES2020,
+      allowNonTsExtensions: true,
+    })
+
+    // Add custom completions for common coding interview patterns
+    monaco.languages.registerCompletionItemProvider("javascript", {
+      provideCompletionItems: (
+        model: monaco.editor.ITextModel,
+        position: monaco.IPosition,
+        context: monaco.languages.CompletionContext,
+        token: monaco.CancellationToken
+      ) => {
+        const word = model.getWordUntilPosition(position)
+        const range = {
+          startLineNumber: position.lineNumber,
+          endLineNumber: position.lineNumber,
+          startColumn: word.startColumn,
+          endColumn: word.endColumn,
+        }
+
+
+        return { suggestions: [] }
       },
-      overviewRulerLanes: 0,
-      hideCursorInOverviewRuler: true,
-      overviewRulerBorder: false,
     })
+  }
 
-    monacoRef.current = editor
-
-    setTimeout(() => {
-      editor.layout()
-    }, 100)
-
-    // Handle content changes
-    const disposable = editor.onDidChangeModelContent(() => {
-      const newValue = editor.getValue()
-      onChange(newValue)
-    })
-
-    // Cleanup
-    return () => {
-      disposable.dispose()
-      editor.dispose()
-    }
-  }, [])
-
-  // Update editor value when prop changes
-  useEffect(() => {
-    if (monacoRef.current && monacoRef.current.getValue() !== value) {
-      monacoRef.current.setValue(value)
-    }
-  }, [value])
-
-  // Update read-only state
-  useEffect(() => {
-    if (monacoRef.current) {
-      monacoRef.current.updateOptions({ readOnly })
-    }
-  }, [readOnly])
-
-  return <div ref={editorRef} className="absolute inset-0 w-full h-full" style={{ minHeight: "200px" }} />
+  return (
+    <Editor
+      height="100%"
+      language={language}
+      value={value}
+      theme="codeDuelDark"
+      onChange={(value) => onChange(value || "")}
+      onMount={handleEditorDidMount}
+      options={{
+        readOnly,
+        minimap: { enabled: false },
+        scrollBeyondLastLine: false,
+        fontSize: 14,
+        // fontFamily: "var(--font-geist-mono), 'Fira Code', 'JetBrains Mono', monospace",
+        lineNumbers: "on",
+        glyphMargin: false,
+        folding: false,
+        lineDecorationsWidth: 0,
+        lineNumbersMinChars: 3,
+        renderLineHighlight: "line",
+        automaticLayout: true,
+        tabSize: 2,
+        insertSpaces: true,
+        wordWrap: "on",
+        contextmenu: false,
+        selectOnLineNumbers: true,
+        roundedSelection: false,
+        cursorStyle: "line",
+        cursorBlinking: "blink",
+        smoothScrolling: true,
+        scrollbar: {
+          vertical: "visible",
+          horizontal: "visible",
+          verticalScrollbarSize: 10,
+          horizontalScrollbarSize: 10,
+        },
+        overviewRulerLanes: 0,
+        hideCursorInOverviewRuler: true,
+        overviewRulerBorder: false,
+      }}
+    />
+  )
 }
